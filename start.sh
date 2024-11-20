@@ -3,6 +3,13 @@
 # Create instance directory if it doesn't exist
 mkdir -p instance
 
+# Set environment variables for development if not set
+if [ -z "$GOOGLE_CLIENT_ID" ]; then
+    echo "Setting development environment variables..."
+    export GOOGLE_CLIENT_ID="dummy-client-id"
+    export FLASK_SECRET_KEY="development-secret-key"
+fi
+
 # Initialize the database
 echo "Initializing database..."
 python init_db.py 2>&1 | tee db_init.log
@@ -25,15 +32,6 @@ ls -l instance/
 # Check database schema
 echo "Database schema:"
 sqlite3 instance/todos.db ".schema"
-
-# Run migrations
-echo "Running migrations..."
-python migrate_db.py 2>&1 | tee migrate.log
-if [ $? -ne 0 ]; then
-    echo "Failed to run migrations. Check migrate.log for details"
-    cat migrate.log
-    exit 1
-fi
 
 # Start the application
 echo "Starting application..."

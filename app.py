@@ -27,6 +27,26 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# Ensure database is initialized
+def init_db():
+    with app.app_context():
+        # Create tables if they don't exist
+        db.create_all()
+        
+        # Verify tables exist
+        inspector = db.inspect(db.engine)
+        tables = inspector.get_table_names()
+        required_tables = {'user', 'group', 'todo'}
+        
+        if not all(table in tables for table in required_tables):
+            print("Warning: Not all required tables exist. Recreating tables...")
+            db.drop_all()
+            db.create_all()
+            print("Database tables created successfully")
+
+# Initialize database tables
+init_db()
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
