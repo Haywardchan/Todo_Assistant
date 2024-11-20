@@ -8,6 +8,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     python3-dev \
+    sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first to leverage Docker cache
@@ -25,12 +26,12 @@ ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 ENV PYTHONUNBUFFERED=1
 
-# Expose port
-EXPOSE 5000
-
 # Make start script executable
 COPY start.sh .
 RUN chmod +x start.sh
+
+# Expose port
+EXPOSE 5000
 
 # Run the application
 CMD ["./start.sh"]
