@@ -28,5 +28,9 @@ ENV PYTHONUNBUFFERED=1
 # Expose port
 EXPOSE 5000
 
+# Make start script executable
+COPY start.sh .
+RUN chmod +x start.sh
+
 # Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["./start.sh"]
