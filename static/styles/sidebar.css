@@ -1,0 +1,175 @@
+/* Sidebar styles */
+.sidebar {
+    width: 280px;
+    background-color: white;
+    border-right: 1px solid #e0e0e0;
+    padding: 20px;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.sidebar-header h2 {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+/* Groups */
+.groups {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.group-item {
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    margin-bottom: 2px;
+}
+
+.group-item:hover {
+    background-color: #f5f5f5;
+}
+
+.group-item.active {
+    background-color: #e3f2fd;
+}
+
+.group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.group-header:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.group-header .group-actions {
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex;
+    gap: 2px;
+}
+
+.group-header:hover .group-actions {
+    opacity: 1;
+}
+
+.group-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.group-link .material-icons {
+    font-size: 18px;
+    color: #666;
+}
+
+.group-name {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Subgroups */
+.subgroups {
+    margin-left: 12px;
+}
+
+.subgroup {
+    position: relative;
+    padding-left: 8px;
+}
+
+.subgroup::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e0e0e0;
+}
+
+.subgroup .group-header {
+    position: relative;
+}
+
+.subgroup .group-header::before {
+    content: none;
+}
+
+/* Group Actions */
+.group-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.add-icon, .delete-icon {
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.add-icon:hover, .delete-icon:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.add-group-btn,
+.add-subgroup-btn,
+.delete-group-btn {
+    padding: 2px;
+}
+
+.add-group-btn:hover,
+.add-subgroup-btn:hover {
+    background-color: rgba(33, 150, 243, 0.1);
+}
+
+.add-subgroup-btn .material-icons {
+    font-size: 16px;
+    color: #2196F3;
+}
+
+.delete-group-btn:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+}
+
+.delete-group-btn .material-icons,
+.delete-all-btn .material-icons {
+    font-size: 16px;
+    color: #f44336;
+}
+
+.delete-all-btn {
+    padding: 2px;
+}
+
+.delete-all-btn:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+}
+
+.new-subgroup-input {
+    width: calc(100% - 24px);
+    height: 24px;
+    padding: 2px 8px;
+    border: 1px solid #2196f3;
+    border-radius: 4px;
+    margin: 4px 0;
+}

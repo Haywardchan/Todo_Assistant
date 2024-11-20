@@ -1,0 +1,273 @@
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 90%;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translate(-50%, -60%);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0;
+}
+
+.modal-body {
+    margin-bottom: 24px;
+}
+
+.modal-body p {
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Close button */
+.close {
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.close:hover {
+    color: #333;
+}
+
+/* Modal buttons */
+.danger-btn, .cancel-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.danger-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.danger-btn:hover {
+    background-color: #c82333;
+}
+
+.cancel-btn {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #dee2e6;
+}
+
+.cancel-btn:hover {
+    background-color: #e2e6ea;
+    border-color: #dae0e5;
+}
+
+/* Add Group Modal Form */
+#addGroupModal form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 24px 24px;
+}
+
+#addGroupModal input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+#addGroupModal input[type="text"]:focus {
+    border-color: #2196F3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+    outline: none;
+}
+
+#addGroupModal input[type="text"]::placeholder {
+    color: #999;
+}
+
+#addGroupModal button[type="submit"] {
+    background-color: #2196F3;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    align-self: flex-end;
+}
+
+#addGroupModal button[type="submit"]:hover {
+    background-color: #1976D2;
+}
+
+#addGroupModal button[type="submit"]:active {
+    background-color: #1565C0;
+    transform: translateY(1px);
+}
+
+/* Adjust modal content padding for add group modal */
+#addGroupModal .modal-content {
+    padding: 24px 0;
+}
+
+#addGroupModal .modal-header {
+    padding: 0 24px;
+    margin-bottom: 16px;
+}
+
+/* Apply these styles to both add group and subgroup modals */
+#addGroupModal .modal-content,
+#addSubgroupModal .modal-content,
+#deleteAllModal .modal-content {
+    max-width: 400px;
+}
+
+/* Add Subgroup Modal Form */
+#addSubgroupModal form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 24px 24px;
+}
+
+#addSubgroupModal input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background-color: #fff;
+}
+
+#addSubgroupModal input[type="text"]:focus {
+    border-color: #2196F3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+    outline: none;
+}
+
+#addSubgroupModal input[type="text"]::placeholder {
+    color: #999;
+}
+
+#addSubgroupModal button[type="submit"] {
+    background-color: #2196F3;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-self: flex-end;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+#addSubgroupModal button[type="submit"]:hover {
+    background-color: #1976D2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#addSubgroupModal button[type="submit"]:active {
+    background-color: #1565C0;
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+/* Adjust modal content padding for add subgroup modal */
+#addSubgroupModal .modal-content {
+    padding: 24px 0;
+}
+
+#addSubgroupModal .modal-header {
+    padding: 0 24px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 16px;
+}
+
+#addSubgroupModal .modal-header h3 {
+    color: #1976D2;
+    font-weight: 600;
+}
+
+/* Add subtle animation for form elements */
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#addSubgroupModal form > * {
+    animation: fadeSlideIn 0.3s ease-out forwards;
+}
+
+#addSubgroupModal input[type="text"] {
+    animation-delay: 0.1s;
+}
+
+#addSubgroupModal button[type="submit"] {
+    animation-delay: 0.2s;
+}

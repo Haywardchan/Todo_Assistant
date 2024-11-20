@@ -1,0 +1,34 @@
+{% macro render_group(group) %}
+<div class="group-item">
+    <div class="group-header">
+        <div class="group-name-container">
+            <span class="material-icons" style="font-size: 16px; margin-right: 4px;">{% if group.subgroups %}folder{% else %}insert_drive_file{% endif %}</span>
+            <span class="group-name">{{ group.name }}</span>
+        </div>
+        <div class="group-actions">
+            <span class="material-icons add-icon" onclick="addNewSubgroup(this, '{{ group.id }}')">add</span>
+            <span class="material-icons delete-icon" onclick="deleteGroup('{{ group.id }}')">delete</span>
+        </div>
+    </div>
+    <div class="subgroups">
+        {% for subgroup in group.children %}
+            {{ render_group(subgroup) }}
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}
+
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>Groups</h2>
+        <button onclick="showAddGroupForm()" class="add-group-btn">
+            <span class="material-icons">add</span>
+            Add Group
+        </button>
+    </div>
+    <div class="groups-container">
+        {% for group in groups %}
+            {{ render_group(group) }}
+        {% endfor %}
+    </div>
+</div>

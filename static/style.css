@@ -1,0 +1,523 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar styles */
+.sidebar {
+    width: 280px;
+    background-color: white;
+    border-right: 1px solid #e0e0e0;
+    padding: 20px;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.sidebar-header h2 {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.groups {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.group-item {
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    margin-bottom: 2px;
+}
+
+.group-item:hover {
+    background-color: #f5f5f5;
+}
+
+.group-item.active {
+    background-color: #e3f2fd;
+}
+
+.group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.group-header:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.group-header .group-actions {
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex;
+    gap: 2px;
+}
+
+.group-header:hover .group-actions {
+    opacity: 1;
+}
+
+.group-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.group-link .material-icons {
+    font-size: 18px;
+    color: #666;
+}
+
+.group-name {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.subgroups {
+    margin-left: 12px;
+}
+
+.group-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.add-icon, .delete-icon {
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.add-icon:hover, .delete-icon:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.add-group-btn,
+.add-subgroup-btn,
+.delete-group-btn {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-group-btn:hover,
+.add-subgroup-btn:hover {
+    background-color: rgba(33, 150, 243, 0.1);
+}
+
+.add-subgroup-btn .material-icons {
+    font-size: 16px;
+    color: #2196F3;
+}
+
+.delete-group-btn:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+}
+
+.delete-group-btn .material-icons,
+.delete-all-btn .material-icons {
+    font-size: 16px;
+    color: #f44336;
+}
+
+.delete-all-btn {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-all-btn:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+}
+
+/* Subgroup styles */
+.subgroup {
+    position: relative;
+    padding-left: 8px;
+}
+
+.subgroup::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e0e0e0;
+}
+
+.subgroup .group-header {
+    position: relative;
+}
+
+.subgroup .group-header::before {
+    content: none;
+}
+
+.new-subgroup-input {
+    width: calc(100% - 24px);
+    height: 24px;
+    padding: 2px 8px;
+    border: 1px solid #2196f3;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    background: white;
+    margin: 2px 0;
+    margin-left: 20px;
+}
+
+.new-subgroup-input:focus {
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.subgroup .material-icons {
+    font-size: 16px;
+    color: #666;
+}
+
+.subgroup .group-actions {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+/* Main content styles */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 24px;
+    color: #333;
+}
+
+/* Form styles */
+.add-todo-form {
+    margin-bottom: 20px;
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="time"],
+.form-group button {
+    height: 38px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-group input[type="text"] {
+    flex: 2;
+    min-width: 200px;
+}
+
+.form-group input[type="date"],
+.form-group input[type="time"] {
+    flex: 1;
+    min-width: 120px;
+}
+
+.form-group .group-input {
+    flex: 1;
+    min-width: 150px;
+}
+
+.form-group .group-input input[type="text"] {
+    width: 100%;
+    min-width: unset;
+}
+
+.form-group button {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+    min-width: 80px;
+}
+
+.form-group button:hover {
+    background-color: #1976D2;
+}
+
+/* Style the datalist dropdown arrow */
+.form-group input[list="groupList"]::-webkit-calendar-picker-indicator {
+    color: #2196F3;
+}
+
+/* Todo item styles */
+.todos {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.todo-item {
+    background-color: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.todo-info {
+    flex-grow: 1;
+}
+
+.todo-title {
+    font-size: 16px;
+    color: #333;
+    margin-right: 12px;
+}
+
+.todo-title.completed {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.todo-group {
+    font-size: 14px;
+    color: #666;
+    background-color: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+}
+
+.todo-schedule {
+    font-size: 14px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.todo-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-complete,
+.btn-delete {
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.btn-complete {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-complete:hover {
+    background-color: #45a049;
+}
+
+.btn-delete {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #da190b;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 15vh auto;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-body p {
+    margin: 0 0 24px 0;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.close {
+    color: #999;
+    font-size: 24px;
+    font-weight: 400;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.danger-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.danger-btn:hover {
+    background-color: #c82333;
+}
+
+.cancel-btn {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #dee2e6;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+    background-color: #e2e6ea;
+    border-color: #dae0e5;
+}
+
+/* Apply these styles to both add group and subgroup modals */
+#addGroupModal .modal-content,
+#addSubgroupModal .modal-content {
+    max-width: 400px;
+}
+
+/* Utility classes */
+.remaining-days {
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+}
+
+.remaining-days.urgent {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.remaining-days.overdue {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.completed {
+    opacity: 0.7;
+}

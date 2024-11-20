@@ -1,0 +1,64 @@
+<div class="main-content">
+    <div class="header">
+        <h1>{% if selected_group %}{{ selected_group }}{% else %}All Tasks{% endif %}</h1>
+    </div>
+    <form class="add-todo-form" method="POST" action="{{ url_for('add') }}">
+        <div class="form-group">
+            <input type="text" name="title" placeholder="Enter task title" required>
+            <input type="date" id="due_date" name="due_date" required>
+            <input type="time" name="end_time" value="23:59">
+            <div class="group-input">
+                <input type="text" name="group" list="groupList" placeholder="Group (Optional)" {% if selected_group %}value="{{ selected_group }}"{% endif %}>
+                <datalist id="groupList">
+                    <option value="">No Group</option>
+                    {% for group, info in groups.items() %}
+                        <option value="{{ group }}">{{ group }}</option>
+                        {% if info.subgroups %}
+                            {% for subgroup in info.subgroups %}
+                                <option value="{{ subgroup.name }}">{{ subgroup.name }}</option>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </datalist>
+            </div>
+            <button type="submit">Add Task</button>
+        </div>
+    </form>
+    
+    <div class="todos">
+        {% for todo in todos %}
+        <div class="todo-item">
+            <div class="todo-info">
+                <span class="todo-title {% if todo.completed %}completed{% endif %}">{{ todo.title }}</span>
+                {% if todo.group %}
+                <span class="todo-group">{{ todo.group }}</span>
+                {% endif %}
+                <div class="todo-schedule">
+                    <span class="due-date">Due: {{ todo.due_date.strftime('%Y-%m-%d') }}</span>
+                    {% set remaining = todo.remaining_days() %}
+                    <span class="remaining-days {% if remaining < 0 %}overdue{% elif remaining <= 3 %}urgent{% endif %}">
+                        {% if remaining < 0 %}
+                            Overdue by {{ -remaining }} day{{ '' if -remaining == 1 else 's' }}
+                        {% elif remaining == 0 %}
+                            Due today
+                        {% else %}
+                            {{ remaining }} day{{ '' if remaining == 1 else 's' }} left
+                        {% endif %}
+                    </span>
+                    {% if todo.start_time or todo.end_time %}
+                    <span class="time">Time: {% if todo.start_time %}{{ todo.start_time.strftime('%H:%M') }}{% endif %}
+                        {% if todo.end_time %} - {{ todo.end_time.strftime('%H:%M') }}{% endif %}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="todo-actions">
+                <a href="{{ url_for('complete', id=todo.id) }}" class="btn-complete">
+                    {% if todo.completed %}Undo{% else %}Complete{% endif %}
+                </a>
+                <a href="{{ url_for('delete', id=todo.id) }}" class="btn-delete">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>

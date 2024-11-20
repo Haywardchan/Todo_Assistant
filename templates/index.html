@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Todo List</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
+    <style>
+        .auth-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            z-index: 1000;
+        }
+        
+        .auth-button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .login-btn {
+            color: #2196F3;
+            border: 1px solid #2196F3;
+            background: white;
+        }
+        
+        .login-btn:hover {
+            background-color: rgba(33, 150, 243, 0.1);
+        }
+        
+        .signup-btn {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+        }
+        
+        .signup-btn:hover {
+            background-color: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-buttons">
+        {% if current_user.is_authenticated %}
+            <span class="user-name">{{ current_user.name }}</span>
+            <a href="{{ url_for('logout') }}" class="auth-button login-btn">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="auth-button login-btn">Login</a>
+            <a href="{{ url_for('signup') }}" class="auth-button signup-btn">Sign Up</a>
+        {% endif %}
+    </div>
+    {% macro render_subgroups(subgroups) %}
+        {% for subgroup in subgroups %}
+        <div class="group-item subgroup {% if selected_group == subgroup.name %}active{% endif %}">
+            <div class="group-header">
+                <a href="{{ url_for('index', group=subgroup.name) }}" class="group-link">
+                    <span class="material-icons">subdirectory_arrow_right</span>
+                    <span class="group-name">{{ subgroup.name }}</span>
+                </a>
+                <div class="group-actions">
+                    <button class="add-subgroup-btn" onclick="showAddSubgroupForm('{{ subgroup.name }}')">
+                        <span class="material-icons">add</span>
+                    </button>
+                    <form action="{{ url_for('delete_group', group=subgroup.name) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this group and all its subgroups?');">
+                        <button type="submit" class="delete-group-btn">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% if subgroup.subgroups %}
+            <div class="subgroups">
+                {{ render_subgroups(subgroup.subgroups) }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% endmacro %}
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Groups</h2>
+                <button class="add-group-btn" onclick="showAddGroupForm()">
+                    <span class="material-icons">add</span>
+                </button>
+            </div>
+            <div class="groups">
+                <div class="group-item {% if not selected_group %}active{% endif %}">
+                    <div class="group-header">
+                        <a href="{{ url_for('index') }}" class="group-link">
+                            <span class="material-icons">list</span>
+                            <span class="group-name">All Tasks</span>
+                        </a>
+                        <div class="group-actions">
+                            <button class="delete-all-btn" onclick="showDeleteAllModal()" title="Delete all tasks and groups">
+                                <span class="material-icons">delete_forever</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% for group, info in groups.items() %}
+                <div class="group-item {% if selected_group == group %}active{% endif %}">
+                    <div class="group-header">
+                        <a href="{{ url_for('index', group=group) }}" class="group-link">
+                            <span class="material-icons">folder</span>
+                            <span class="group-name">{{ group }}</span>
+                        </a>
+                        <div class="group-actions">
+                            <button class="add-subgroup-btn" onclick="showAddSubgroupForm('{{ group }}')">
+                                <span class="material-icons">add</span>
+                            </button>
+                            <form action="{{ url_for('delete_group', group=group) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this group and all its subgroups?');">
+                                <button type="submit" class="delete-group-btn">
+                                    <span class="material-icons">delete</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% if info.subgroups %}
+                    <div class="subgroups">
+                        {{ render_subgroups(info.subgroups) }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>{% if selected_group %}{{ selected_group }}{% else %}All Tasks{% endif %}</h1>
+            </div>
+            <form class="add-todo-form" method="POST" action="{{ url_for('add') }}">
+                <div class="form-group">
+                    <input type="text" name="title" placeholder="Enter task title" required>
+                    <input type="date" id="due_date" name="due_date" required>
+                    <input type="time" name="end_time">
+                    <div class="group-input">
+                        <input type="text" name="group" list="groupList" placeholder="Group (Optional)" {% if selected_group %}value="{{ selected_group }}"{% endif %}>
+                        <datalist id="groupList">
+                            <option value="">No Group</option>
+                            {% for group, info in groups.items() %}
+                                <option value="{{ group }}">{{ group }}</option>
+                                {% if info.subgroups %}
+                                    {% for subgroup in info.subgroups %}
+                                        <option value="{{ subgroup.name }}">{{ subgroup.name }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <button type="submit">Add</button>
+                </div>
+            </form>
+            
+            <div class="todos">
+                {% for todo in todos %}
+                <div class="todo-item {% if todo.completed %}completed{% endif %}">
+                    <div class="todo-info">
+                        <span class="todo-title {% if todo.completed %}completed{% endif %}">{{ todo.title }}</span>
+                        {% if todo.group %}
+                        <span class="todo-group">{{ todo.group }}</span>
+                        {% endif %}
+                        <div class="todo-schedule">
+                            <span class="due-date">Due: {{ todo.due_date.strftime('%Y-%m-%d') }}</span>
+                            {% set remaining = todo.remaining_days() %}
+                            <span class="remaining-days {% if remaining < 0 %}overdue{% elif remaining <= 3 %}urgent{% endif %}">
+                                {% if remaining < 0 %}
+                                    Overdue by {{ -remaining }} day{{ '' if -remaining == 1 else 's' }}
+                                {% elif remaining == 0 %}
+                                    Due today
+                                {% else %}
+                                    {{ remaining }} day{{ '' if remaining == 1 else 's' }} left
+                                {% endif %}
+                            </span>
+                            {% if todo.end_time %}
+                            <span class="time">Time: {{ todo.end_time.strftime('%H:%M') }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="todo-actions">
+                        <a href="{{ url_for('complete', id=todo.id) }}" class="btn-complete">
+                            {% if todo.completed %}Undo{% else %}Complete{% endif %}
+                        </a>
+                        <a href="{{ url_for('delete', id=todo.id) }}" class="btn-delete">Delete</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div id="addSubgroupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Subgroup</h3>
+                <span class="close" onclick="closeModal('addSubgroupModal')">&times;</span>
+            </div>
+            <form id="addSubgroupForm" method="POST" action="{{ url_for('add_group') }}">
+                <input type="text" name="name" placeholder="Enter subgroup name" required>
+                <input type="hidden" name="parent_group" id="parentGroupInput">
+                <button type="submit">Add Subgroup</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addGroupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Group</h3>
+                <span class="close" onclick="closeModal('addGroupModal')">&times;</span>
+            </div>
+            <form method="POST" action="{{ url_for('add_group') }}">
+                <input type="text" name="name" placeholder="Enter group name" required>
+                <input type="hidden" name="parent_group" value="">
+                <button type="submit">Add Group</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete All Confirmation Modal -->
+    <div id="deleteAllModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Delete All</h3>
+                <span class="close" onclick="closeModal('deleteAllModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete all tasks and groups? This action cannot be undone.</p>
+                <div class="modal-buttons">
+                    <button onclick="deleteAll()" class="danger-btn">Yes, Delete All</button>
+                    <button onclick="closeModal('deleteAllModal')" class="cancel-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date as default when the page loads
+        window.onload = function() {
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var yyyy = today.getFullYear();
+            today = yyyy + '-' + mm + '-' + dd;
+            document.getElementById('due_date').value = today;
+        }
+
+        function showAddSubgroupForm(parentGroup) {
+            const modal = document.getElementById('addSubgroupModal');
+            const parentGroupInput = document.getElementById('parentGroupInput');
+            parentGroupInput.value = parentGroup;
+            modal.style.display = 'block';
+        }
+
+        function showAddGroupForm() {
+            const modal = document.getElementById('addGroupModal');
+            modal.style.display = 'block';
+        }
+
+        function showDeleteAllModal() {
+            const modal = document.getElementById('deleteAllModal');
+            modal.style.display = 'block';
+        }
+
+        function deleteAll() {
+            fetch("{{ url_for('delete_all_tasks') }}", {
+                method: 'POST'
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!-- Add Group Modal -->
+<div id="addGroupModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Group</h3>
+            <span class="close" onclick="closeModal('addGroupModal')">&times;</span>
+        </div>
+        <form method="POST" action="{{ url_for('add_group') }}">
+            <input type="text" name="name" placeholder="Enter group name" required>
+            <input type="hidden" name="parent_group" value="">
+            <button type="submit">Add Group</button>
+        </form>
+    </div>
+</div>
+
+<!-- Delete All Confirmation Modal -->
+<div id="deleteAllModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Delete All</h3>
+            <span class="close" onclick="closeModal('deleteAllModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete all tasks and groups? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button onclick="deleteAll()" class="danger-btn">Yes, Delete All</button>
+                <button onclick="closeModal('deleteAllModal')" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
