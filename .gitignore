@@ -41,3 +41,6 @@ instance/
 *.swp
 *.swo
 .DS_Store
+
+# Documentation
+API_DOCUMENTATION.md

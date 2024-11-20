@@ -1,4 +1,17 @@
-<!-- Add Group Modal -->
+<div id="addSubgroupModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Subgroup</h3>
+            <span class="close" onclick="closeModal('addSubgroupModal')">&times;</span>
+        </div>
+        <form id="addSubgroupForm" method="POST" action="{{ url_for('add_group') }}">
+            <input type="text" name="name" placeholder="Enter subgroup name" required>
+            <input type="hidden" name="parent_group" id="parentGroupInput">
+            <button type="submit">Add Subgroup</button>
+        </form>
+    </div>
+</div>
+
 <div id="addGroupModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">

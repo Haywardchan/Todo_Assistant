@@ -1,18 +1,19 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, date
-import os
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from datetime import datetime
 from dotenv import load_dotenv
+import os
+
+from models import db, User, Group, Todo
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todos.db'
-app.config['SECRET_KEY'] = os.urandom(24).hex()  # Generate a secure random key
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', os.urandom(24).hex())  # Use environment variable if available
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Google OAuth2 credentials
@@ -20,52 +21,11 @@ GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 if not GOOGLE_CLIENT_ID:
     raise ValueError("No Google Client ID set. Please configure GOOGLE_CLIENT_ID in .env file")
 
-db = SQLAlchemy()
+# Initialize extensions
 db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-
-# Define models
-class Group(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
-    parent_group = db.Column(db.String(50), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(100), unique=True)
-    name = db.Column(db.String(100))
-    todos = db.relationship('Todo', backref='user', lazy=True)
-
-class Todo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    completed = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    due_date = db.Column(db.Date, nullable=True)
-    end_time = db.Column(db.Time, nullable=True)
-    group = db.Column(db.String(50), nullable=True)
-    parent_group = db.Column(db.String(50), nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-
-    def remaining_days(self):
-        today = date.today()
-        delta = self.due_date - today
-        return delta.days
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'title': self.title,
-            'completed': self.completed,
-            'due_date': self.due_date.strftime('%Y-%m-%d') if self.due_date else None,
-            'end_time': self.end_time.strftime('%H:%M') if self.end_time else None,
-            'remaining_days': self.remaining_days() if self.due_date else None,
-            'group': self.group,
-            'parent_group': self.parent_group
-        }
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -74,9 +34,12 @@ def load_user(user_id):
 def get_group_hierarchy():
     """Get all groups with their subgroups"""
     with app.app_context():
-        # Get all groups
-        main_groups = Group.query.filter_by(parent_group=None).all()
-        all_groups = Group.query.all()
+        if not current_user.is_authenticated:
+            return {}
+            
+        # Get all groups for the current user
+        main_groups = Group.query.filter_by(parent_group=None, user_id=current_user.id).all()
+        all_groups = Group.query.filter_by(user_id=current_user.id).all()
         
         # Create a mapping of parent to children
         group_children = {}
@@ -104,9 +67,15 @@ def get_group_hierarchy():
         
         # Add main groups with their complete subgroup trees
         for group in sorted(main_groups, key=lambda x: x.name):
+            # Only count tasks belonging to the current user
+            task_count = Todo.query.filter_by(
+                group=group.name,
+                user_id=current_user.id
+            ).count()
+            
             hierarchy[group.name] = {
                 'subgroups': build_subgroup_tree(group.name),
-                'task_count': Todo.query.filter_by(group=group.name).count()
+                'task_count': task_count
             }
         
         return hierarchy
@@ -139,8 +108,8 @@ def add():
     
     if title:
         # Create new group if it doesn't exist
-        if group and not Group.query.filter_by(name=group).first():
-            new_group = Group(name=group)
+        if group and not Group.query.filter_by(name=group, user_id=current_user.id).first():
+            new_group = Group(name=group, user_id=current_user.id)
             db.session.add(new_group)
             db.session.commit()
         
@@ -168,14 +137,18 @@ def add_group():
     
     if name and name.strip():
         name = name.strip()
-        # Check if group already exists
-        existing_group = Group.query.filter_by(name=name).first()
+        # Check if group already exists for the current user
+        existing_group = Group.query.filter_by(
+            name=name,
+            user_id=current_user.id
+        ).first()
         if not existing_group:
             # If parent_group is empty string or "None", set it to None
             parent = None if not parent_group or parent_group == "None" else parent_group
             new_group = Group(
                 name=name,
-                parent_group=parent
+                parent_group=parent,
+                user_id=current_user.id
             )
             db.session.add(new_group)
             db.session.commit()
@@ -214,17 +187,17 @@ def delete_group(group):
     with app.app_context():
         def delete_group_recursive(group_name):
             # Get all subgroups
-            subgroups = Group.query.filter_by(parent_group=group_name).all()
+            subgroups = Group.query.filter_by(parent_group=group_name, user_id=current_user.id).all()
             
             # Recursively delete all subgroups
             for subgroup in subgroups:
                 delete_group_recursive(subgroup.name)
             
             # Delete all tasks in this group
-            Todo.query.filter_by(group=group_name).delete(synchronize_session=False)
+            Todo.query.filter_by(group=group_name, user_id=current_user.id).delete(synchronize_session=False)
             
             # Delete the group itself
-            group_to_delete = Group.query.filter_by(name=group_name).first()
+            group_to_delete = Group.query.filter_by(name=group_name, user_id=current_user.id).first()
             if group_to_delete:
                 db.session.delete(group_to_delete)
         
@@ -244,10 +217,40 @@ def delete_all_tasks():
     """Delete all tasks and groups from the database"""
     with app.app_context():
         # Delete all tasks and groups
-        Todo.query.delete()
-        Group.query.delete()
+        Todo.query.filter_by(user_id=current_user.id).delete()
+        Group.query.filter_by(user_id=current_user.id).delete()
         db.session.commit()
     return '', 204  # No content response
+
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit(id):
+    todo = Todo.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    
+    if request.method == 'POST':
+        todo.title = request.form.get('title')
+        todo.due_date = datetime.strptime(request.form.get('due_date'), '%Y-%m-%d')
+        
+        end_time = request.form.get('end_time')
+        if end_time:
+            try:
+                todo.end_time = datetime.strptime(end_time, '%H:%M').time()
+            except ValueError:
+                todo.end_time = None
+        else:
+            todo.end_time = None
+        
+        group_name = request.form.get('group')
+        if group_name:
+            group = Group.query.filter_by(name=group_name, user_id=current_user.id).first()
+            todo.group = group_name if group else None
+        else:
+            todo.group = None
+        
+        db.session.commit()
+        return redirect(url_for('index'))
+    
+    return render_template('edit_todo.html', todo=todo, groups=get_group_hierarchy())
 
 @app.route('/signup')
 def signup():

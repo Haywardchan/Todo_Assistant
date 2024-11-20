@@ -7,65 +7,13 @@
         var yyyy = today.getFullYear();
         today = yyyy + '-' + mm + '-' + dd;
         document.getElementById('due_date').value = today;
-        
-        // Set default end time to 23:59
-        document.querySelector('input[name="end_time"]').value = '23:59';
     }
 
-    function addNewSubgroup(button, parentGroup) {
-        // Find the subgroups container
-        const groupItem = button.closest('.group-item');
-        const subgroupsContainer = groupItem.querySelector('.subgroups');
-        
-        // Check if there's already an input field
-        if (document.querySelector('.new-subgroup-input')) {
-            return;
-        }
-
-        // Create input field
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'new-subgroup-input';
-        input.placeholder = 'Enter subgroup name';
-        
-        // Add input to subgroups container
-        subgroupsContainer.insertBefore(input, subgroupsContainer.firstChild);
-        input.focus();
-
-        // Handle input events
-        input.addEventListener('keyup', function(event) {
-            if (event.key === 'Enter') {
-                const name = input.value.trim();
-                if (name) {
-                    // Create form and submit
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '{{ url_for("add_group") }}';
-                    
-                    const nameInput = document.createElement('input');
-                    nameInput.type = 'hidden';
-                    nameInput.name = 'name';
-                    nameInput.value = name;
-                    
-                    const parentInput = document.createElement('input');
-                    parentInput.type = 'hidden';
-                    parentInput.name = 'parent_group';
-                    parentInput.value = parentGroup;
-                    
-                    form.appendChild(nameInput);
-                    form.appendChild(parentInput);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            } else if (event.key === 'Escape') {
-                input.remove();
-            }
-        });
-
-        // Handle focus loss
-        input.addEventListener('blur', function() {
-            input.remove();
-        });
+    function showAddSubgroupForm(parentGroup) {
+        const modal = document.getElementById('addSubgroupModal');
+        const parentGroupInput = document.getElementById('parentGroupInput');
+        parentGroupInput.value = parentGroup;
+        modal.style.display = 'block';
     }
 
     function showAddGroupForm() {
@@ -79,11 +27,8 @@
     }
 
     function deleteAll() {
-        fetch('/delete_all_tasks', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        fetch("{{ url_for('delete_all_tasks') }}", {
+            method: 'POST'
         }).then(response => {
             if (response.ok) {
                 window.location.reload();

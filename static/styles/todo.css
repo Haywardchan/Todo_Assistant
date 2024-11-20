@@ -97,6 +97,55 @@
     box-shadow: none;
 }
 
+/* Edit form styles */
+.edit-todo-form {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.edit-todo-form h2 {
+    margin: 0 0 20px;
+    color: #333;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-save {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-save:hover {
+    background-color: rgba(76, 175, 80, 0.2);
+}
+
+.btn-cancel {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-cancel:hover {
+    background-color: rgba(244, 67, 54, 0.2);
+}
+
 /* Responsive adjustments */
 @media (max-width: 1024px) {
     .form-group {
@@ -180,7 +229,7 @@
     gap: 8px;
 }
 
-.btn-complete, .btn-delete {
+.btn-complete, .btn-edit, .btn-delete {
     padding: 6px 12px;
     border-radius: 4px;
     text-decoration: none;
@@ -195,6 +244,15 @@
 
 .btn-complete:hover {
     background-color: rgba(76, 175, 80, 0.2);
+}
+
+.btn-edit {
+    color: #2196F3;
+    background-color: rgba(33, 150, 243, 0.1);
+}
+
+.btn-edit:hover {
+    background-color: rgba(33, 150, 243, 0.2);
 }
 
 .btn-delete {

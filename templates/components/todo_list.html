@@ -6,7 +6,7 @@
         <div class="form-group">
             <input type="text" name="title" placeholder="Enter task title" required>
             <input type="date" id="due_date" name="due_date" required>
-            <input type="time" name="end_time" value="23:59">
+            <input type="time" name="end_time">
             <div class="group-input">
                 <input type="text" name="group" list="groupList" placeholder="Group (Optional)" {% if selected_group %}value="{{ selected_group }}"{% endif %}>
                 <datalist id="groupList">
@@ -21,13 +21,13 @@
                     {% endfor %}
                 </datalist>
             </div>
-            <button type="submit">Add Task</button>
+            <button type="submit">Add</button>
         </div>
     </form>
     
     <div class="todos">
         {% for todo in todos %}
-        <div class="todo-item">
+        <div class="todo-item {% if todo.completed %}completed{% endif %}">
             <div class="todo-info">
                 <span class="todo-title {% if todo.completed %}completed{% endif %}">{{ todo.title }}</span>
                 {% if todo.group %}
@@ -45,10 +45,8 @@
                             {{ remaining }} day{{ '' if remaining == 1 else 's' }} left
                         {% endif %}
                     </span>
-                    {% if todo.start_time or todo.end_time %}
-                    <span class="time">Time: {% if todo.start_time %}{{ todo.start_time.strftime('%H:%M') }}{% endif %}
-                        {% if todo.end_time %} - {{ todo.end_time.strftime('%H:%M') }}{% endif %}
-                    </span>
+                    {% if todo.end_time %}
+                    <span class="time">Time: {{ todo.end_time.strftime('%H:%M') }}</span>
                     {% endif %}
                 </div>
             </div>
@@ -56,6 +54,7 @@
                 <a href="{{ url_for('complete', id=todo.id) }}" class="btn-complete">
                     {% if todo.completed %}Undo{% else %}Complete{% endif %}
                 </a>
+                <a href="{{ url_for('edit', id=todo.id) }}" class="btn-edit">Edit</a>
                 <a href="{{ url_for('delete', id=todo.id) }}" class="btn-delete">Delete</a>
             </div>
         </div>

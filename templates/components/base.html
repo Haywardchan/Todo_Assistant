@@ -2,10 +2,19 @@
 <html>
 <head>
     <title>{% block title %}Todo List{% endblock %}</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
 </head>
 <body>
+    <div class="auth-buttons">
+        {% if current_user.is_authenticated %}
+            <span class="user-name">{{ current_user.name }}</span>
+            <a href="{{ url_for('logout') }}" class="auth-button login-btn">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="auth-button login-btn">Login</a>
+            <a href="{{ url_for('signup') }}" class="auth-button signup-btn">Sign Up</a>
+        {% endif %}
+    </div>
     {% block content %}{% endblock %}
     {% block scripts %}{% endblock %}
 </body>
